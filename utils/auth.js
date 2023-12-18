@@ -25,6 +25,7 @@ axios({
     console.log(result);
 
     // 请求个人信息并设置到页面
+    // 使用优化axios的响应结果，直接返回data数据对象
     document.querySelector('.nick-name').innerHTML = result.data.name
     
 }).catch(error => {

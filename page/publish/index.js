@@ -61,7 +61,7 @@ document.querySelector('.img-file').addEventListener('change', async e => {
 
 // 优化：点击 img 可以重新切换封面
 // 思路：img点击 => 用JS方式触发文件选择元素click事件方法
-document.querySelector('.rounded ').addEventListener('click',()=> {
+document.querySelector('.rounded ').addEventListener('click', () => {
     document.querySelector('.img-file').click()
     // 循环->监听图片选择区域的change事件-重新覆盖一张封面
 })
@@ -73,6 +73,61 @@ document.querySelector('.rounded ').addEventListener('click',()=> {
  *  3.3 调用 Alert 警告框反馈结果给用户
  *  3.4 重置表单并跳转到列表页
  */
+// 3.1 基于 form-serialize 插件收集表单数据对象
+// 点击“保存”按钮，获取表单数据
+document.querySelector('.send').addEventListener('click', async () => {
+    const form = document.querySelector('.art-form')
+    const data = serialize(form, { hash: true, empty: true })
+    // console.log(data);
+    // 发布文章 参数不需要id,移除id
+    delete data.id
+    // console.log(data);
+
+    // 给data对象添加cover属性
+    data.cover = {
+        type: 1, //封面类型
+        images: [document.querySelector('.rounded ').src] //封面图片URL
+    }
+    // console.log(data);
+
+    // 捕获错误
+    try {
+        // 发布文章-发送请求
+        const res = await axios({
+            url: '/v1_0/mp/articles',
+            method: 'POST',
+            // 携带请求头的参数，已经封装好了
+            data
+        })
+        console.log(res);
+        // 3.3 调用 Alert 警告框反馈结果给用户
+        myAlert(true, "发布成功！")
+
+        // 3.4 重置表单并跳转到列表页
+        // 已经获取到表单form
+        form.reset() //只能重置表单数据
+        // 手动重置图片与富文本编辑
+        // 渲染到页面img标签中
+        document.querySelector('.rounded').src = ''
+        // 显示img标签
+        document.querySelector('.rounded').classList.remove('show')
+        // 隐藏上传图片的“+”标签
+        document.querySelector('.place').classList.remove('hide')
+
+        // 重置富文本编辑-调用方法
+        editor.setHtml()
+
+
+        // 跳转到列表页
+        setTimeout(() => {
+            location.href = '../content/index.html'
+        }, 1500);
+
+    } catch (error) {
+        // 调用 Alert 警告框反馈结果给用户
+        myAlert(false, error.response.data.message)
+    }
+})
 
 /**
  * 目标4：编辑-回显文章

@@ -26,7 +26,7 @@ document.querySelector('.btn').addEventListener('click', () => {
         myAlert(true, '登录成功！')
 
         // 登录成功后，保存 token 令牌字符串到本地，并跳转到内容列表页面
-        localStorage.setItem('token', result.data.data.token)
+        localStorage.setItem('token', result.data.token)
 
         // 弹框弹出后，延迟1.5秒后执行
         setTimeout(() => {

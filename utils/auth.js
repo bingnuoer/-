@@ -25,7 +25,7 @@ axios({
     console.log(result);
 
     // 请求个人信息并设置到页面
-    document.querySelector('.nick-name').innerHTML = result.data.data.name
+    document.querySelector('.nick-name').innerHTML = result.data.name
     
 }).catch(error => {
     console.log(error);

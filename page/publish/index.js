@@ -75,7 +75,10 @@ document.querySelector('.rounded ').addEventListener('click', () => {
  */
 // 3.1 基于 form-serialize 插件收集表单数据对象
 // 点击“保存”按钮，获取表单数据
-document.querySelector('.send').addEventListener('click', async () => {
+document.querySelector('.send').addEventListener('click', async e => {
+    // 如果是修改文章，就不走下面发布文章的逻辑
+    if (e.target.innerHTML !== '发布') return
+    // 以下是发布的逻辑
     const form = document.querySelector('.art-form')
     const data = serialize(form, { hash: true, empty: true })
     // console.log(data);
@@ -168,18 +171,18 @@ document.querySelector('.send').addEventListener('click', async () => {
                 // 取出对象里的元素形成一个数组（Object.keys(dataObj)），遍历数组元素
                 Object.keys(dataObj).forEach(key => {
                     // 回显图片
-                    if(key === 'rounded'){
+                    if (key === 'rounded') {
                         // 封面设置-请求的数据对象中有封面
-                        if(dataObj[key]){
+                        if (dataObj[key]) {
                             // 回显封面
                             document.querySelector('.rounded').src = dataObj[key]
                             document.querySelector('.rounded').classList.add('show')
                             document.querySelector('.place').classList.add('hide')
                         }
-                    }else if( key === 'content'){
+                    } else if (key === 'content') {
                         // 富文本编辑器回显
                         editor.setHtml = dataObj[key]
-                    }else{
+                    } else {
                         // 用name属性，快速获取表单元素并赋值
                         document.querySelector(`[name=${key}]`).value = dataObj[key]
                     }
@@ -195,3 +198,33 @@ document.querySelector('.send').addEventListener('click', async () => {
  *  5.2 调用编辑文章接口，保存信息到服务器
  *  5.3 基于 Alert 反馈结果消息给用户
  */
+// 点击修改按钮，修改文章
+document.querySelector('.send').addEventListener('click', async e => {
+    // 5.1 判断按钮文字，区分业务（因为共用一套表单）
+    if (e.target.innerHTML !== '修改') return
+    // 修改文章的逻辑
+    // 获取表单数据
+    const form = document.querySelector('.art-form')
+    const data = serialize(form, { hash: true, empty: true })
+    console.log(data);
+
+    // 5.2 调用编辑文章接口，保存信息到服务器
+    try{
+        const res = await axios({
+            url: `/v1_0/mp/articles/${data.id}`,
+            method: 'PUT',
+            data: {
+                ...data,
+                cover: {
+                    type: document.querySelector('.rounded ').src ? 1 : 0,
+                    images: [document.querySelector('.rounded ').src ? 1 : 0]
+                }
+            }
+        })
+        console.log(res);
+        myAlert(true, '修改文章成功！')
+    }catch(error){
+        myAlert(false, error.response.data.message)
+    }
+
+})

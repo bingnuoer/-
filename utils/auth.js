@@ -27,7 +27,7 @@ axios({
     // 请求个人信息并设置到页面
     // 使用优化axios的响应结果，直接返回data数据对象
     document.querySelector('.nick-name').innerHTML = result.data.name
-    
+
 }).catch(error => {
     console.log(error);
 })
@@ -38,3 +38,12 @@ axios({
  *  3.1 绑定点击事件
  *  3.2 清空本地缓存，跳转到登录页面
  */
+
+document.querySelector('.quit').addEventListener('click', e => {
+    // 3.2 清空本地缓存，跳转到登录页面
+    setTimeout(() => {
+        myAlert(true, '退出成功！')
+    }, 1500);
+    localStorage.clear()
+    location.href = '../login/index.html'
+})

@@ -186,4 +186,12 @@ document.querySelector('.art-list').addEventListener('click',async e => {
 })
 
 // 点击编辑时，获取文章 id，跳转到发布文章页面传递文章 id 过去
+document.querySelector('.art-list').addEventListener('click',e=>{
+    if(e.target.classList.contains('edit')){
+        const artId = e.target.parentNode.dataset.id
+        console.log(artId);
+        // 跳转到发布文章页面
+        location.href = `../publish/index.html?id=${artId}`
+    }
+})
 

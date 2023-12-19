@@ -129,13 +129,65 @@ document.querySelector('.send').addEventListener('click', async () => {
     }
 })
 
-/**
- * 目标4：编辑-回显文章
- *  4.1 页面跳转传参（URL 查询参数方式）
- *  4.2 发布文章页面接收参数判断（共用同一套表单）
- *  4.3 修改标题和按钮文字
- *  4.4 获取文章详情数据并回显表单
- */
+    /**
+     * 目标4：编辑-回显文章
+     *  4.1 页面跳转传参（URL 查询参数方式）
+     *  4.2 发布文章页面接收参数判断（共用同一套表单）
+     *  4.3 修改标题和按钮文字
+     *  4.4 获取文章详情数据并回显表单
+     */
+    ; (function () {
+        // 4.2 发布文章页面接收参数(location.search)判断（共用同一套表单）
+        // console.log(location.search); //?id=cffa853a-0426-4d46-ba43-a7c89a57dc2f
+        const paramsStr = location.search
+        // 参数 键和值 分离获取
+        const params = new URLSearchParams(paramsStr)
+        params.forEach(async (value, key) => {
+            console.log(value, key);
+            // 跳转页面后，有id参数-编辑文章业务
+            //            无id参数-发布文章业务
+            // 当前有要编辑的文章id传过来，编辑业务
+            if (key === 'id') {
+                // 4.3 修改标题和按钮文字
+                document.querySelector('.title span').innerHTML = '修改文章'
+                document.querySelector('.send').innerHTML = '修改'
+
+                // 4.4 获取文章详情数据并回显表单
+                const res = await axios({
+                    url: `/v1_0/mp/articles/${value}`,
+                })
+                console.log(res);
+                const dataObj = {
+                    channel_id: res.data.channel_id,
+                    title: res.data.title,
+                    rounded: res.data.cover.images[0],
+                    content: res.data.content,
+                    id: res.data.id
+                }
+                // 遍历数据对象(为一个数组)属性，映射到页面元素上，快速赋值
+                // 取出对象里的元素形成一个数组（Object.keys(dataObj)），遍历数组元素
+                Object.keys(dataObj).forEach(key => {
+                    // 回显图片
+                    if(key === 'rounded'){
+                        // 封面设置-请求的数据对象中有封面
+                        if(dataObj[key]){
+                            // 回显封面
+                            document.querySelector('.rounded').src = dataObj[key]
+                            document.querySelector('.rounded').classList.add('show')
+                            document.querySelector('.place').classList.add('hide')
+                        }
+                    }else if( key === 'content'){
+                        // 富文本编辑器回显
+                        editor.setHtml = dataObj[key]
+                    }else{
+                        // 用name属性，快速获取表单元素并赋值
+                        document.querySelector(`[name=${key}]`).value = dataObj[key]
+                    }
+                })
+            }
+        })
+    })();
+
 
 /**
  * 目标5：编辑-保存文章
